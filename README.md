@@ -1,10 +1,10 @@
 # RCMv2
 
+### work in progress!
 
 ### This program controls a robotic arm.
 
-Open in VSCode (using [PlatformIO](https://platformio.org/platformio-ide)), or use the Arduino IDE.
-
+Open in VSCode (using [PlatformIO](https://platformio.org/platformio-ide))
 
 https://github.com/vroomyhippothing/arm
 

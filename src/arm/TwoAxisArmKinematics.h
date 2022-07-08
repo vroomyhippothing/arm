@@ -1,7 +1,9 @@
-#ifndef _TWO_AXIS_ARM_KINEMATICS_H_
-#define _TWO_AXIS_ARM_KINEMATICS_H_
+#ifndef TWO_AXIS_ARM_KINEMATICS_H
+#define TWO_AXIS_ARM_KINEMATICS_H
 #include <Arduino.h>
-// from https://github.com/page-turner/page-turner
+// The inverse kinematics formulas in this file are based on work by Benjamin, @rowanberry, @carlosdperezruiz, and @joshua-8
+// https://github.com/page-turner/page-turner and before that https://github.com/P-B-and-J/arm-testing
+
 /**
  * @brief  reverse kinematics formula for a 2D arm
  * @note  angles are in degrees
@@ -37,31 +39,4 @@ bool cartToAngles(float x, float y, float& theta1, float& theta2, float d1, floa
     return true;
 }
 
-/**
- * @brief  convert torque measurements at the two joints into force being applied by the arm
- * @param  theta1: (float) angle of first servo
- * @param  theta2: (float) angle of second servo
- * @param  torque1: (float) torque of first servo
- * @param  torque2: (float) torque of second servo
- * @param  Fx: (float&) horizontal component of force (this variable is changed)
- * @param  Fy: (float&) vertical component of force (this variable is changed)
- * @param  d1: (float) length of first arm
- * @param  d2: (float) length of second arm
- * @param  x: (float) x coordinate used to calculate thetas
- * @param  y: (float) y coordinate used to calculate thetas
- * @retval None
- */
-void torqueToForces(float theta1, float theta2, float torque1, float torque2, float& Fx, float& Fy, float d1, float d2, float x, float y)
-{
-    theta1 = radians(theta1);
-    theta2 = radians(theta2);
-    //(px,py) is location of second joint
-    float px = -sin(theta1) * d1;
-    float py = cos(theta1) * d1;
-    float r_squared = sq(x) + sq(y);
-    // Thanks Eli for help with this formula!
-    Fx = torque2 * (py - y) / sq(d2) + torque1 * -y / r_squared;
-    Fy = torque2 * (x - px) / sq(d2) + torque1 * x / r_squared;
-}
-
-#endif
+#endif // TWO_AXIS_ARM_KINEMATICS_H
