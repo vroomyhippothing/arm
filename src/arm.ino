@@ -15,8 +15,9 @@
 // pins
 const byte ONBOARD_LED = 2;
 const byte mainVoltageMonitorPin = 36;
-const byte pressurizeValvePin = 24;
-const byte ventValvePin = 25;
+const byte pressurizeValvePin = 32;
+const byte ventValvePin = 33;
+const byte compressorPin = 25;
 
 // constants
 const float mainVoltageDACUnitsPerVolt = 380;
@@ -45,11 +46,11 @@ float compressorDuty = 0;
 // objects
 JVoltageCompMeasure<10> mainVoltageComp = JVoltageCompMeasure<10>(mainVoltageMonitorPin, mainVoltageDACUnitsPerVolt);
 
-PressureSensorAnalogRead storedPressureSensor = PressureSensorAnalogRead(35, 1.0, 0); // pin, calibration, zero
-PressureSensorAnalogRead workingPressureSensor = PressureSensorAnalogRead(36, 1.0); // pin, calibration, zero
-PressureSensorAnalogRead clawPressureSensor = PressureSensorAnalogRead(25, 1.0); // pin, calibration, zero
+PressureSensorAnalogRead storedPressureSensor = PressureSensorAnalogRead(39, 120.0 / 2210, 15); // pin, calibration, zero
+PressureSensorAnalogRead workingPressureSensor = PressureSensorAnalogRead(34, 60.0 / 1365, 55); // pin, calibration, zero
+PressureSensorAnalogRead clawPressureSensor = PressureSensorAnalogRead(35, 60.0 / 2635, 260); // pin, calibration, zero
 
-CompressorControllerDigitalWrite compressorController = CompressorControllerDigitalWrite(34, HIGH);
+CompressorControllerDigitalWrite compressorController = CompressorControllerDigitalWrite(compressorPin, HIGH);
 
 PneumaticBoardController pBoard = PneumaticBoardController(compressorController);
 
@@ -78,6 +79,9 @@ inline void Disable()
 inline void PowerOn()
 {
     // runs once on robot startup, set pin modes and use begin() if applicable here
+    storedPressureSensor.begin();
+    workingPressureSensor.begin();
+    clawPressureSensor.begin();
 }
 
 inline void Always()
@@ -86,6 +90,10 @@ inline void Always()
     loopTimeMicros = tempMicros - lastMicros;
     lastMicros = tempMicros;
     mainVoltage = mainVoltageComp.getSupplyVoltage();
+
+    storedPressure = storedPressureSensor.getPressure(true);
+    workingPressure = workingPressureSensor.getPressure(true);
+    clawPressure = clawPressureSensor.getPressure(true);
 
     // enabling and disabling is handled internally
     pBoard.run(enabled, storedPressure, workingPressure, compressorMode, storedPressureSetpoint);

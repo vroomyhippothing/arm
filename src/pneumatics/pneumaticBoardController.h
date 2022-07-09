@@ -19,7 +19,7 @@ public:
     void run(bool enabled, float storedPressure, float workingPressure, byte compressorMode, float storedPressureSetpoint)
     {
         compressorController.setEnable(enabled);
-        compressing = true;
+        compressing = enabled;
         compressorController.setCompressor(compressing);
     }
     bool isCompressorOn()

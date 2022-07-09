@@ -14,8 +14,11 @@ public:
      * @note  call run() first to get an updated value
      * @retval
      */
-    float getPressure()
+    float getPressure(bool _run = false)
     {
+        if (_run) {
+            run();
+        }
         return pressure;
     }
     /**
