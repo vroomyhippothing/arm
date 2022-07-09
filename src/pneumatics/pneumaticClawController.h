@@ -18,6 +18,11 @@ public:
     }
     void run(bool enabled, bool clawAuto, bool clawGrabAuto, float clawPressurizeVal, bool clawVentVal, float clawAutoPressure)
     {
+        pressurizeValve.setEnable(enabled);
+        ventValve.setEnable(enabled);
+
+        pressurizeValve.set(clawPressurizeVal);
+        ventValve.set(clawVentVal);
     }
 };
 #endif // PNEUMATIC_CLAW_CONTROLLER_H

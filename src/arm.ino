@@ -5,6 +5,7 @@
 #include <ESP32_easy_wifi_data.h> //https://github.com/joshua-8/ESP32_easy_wifi_data
 #include <JMotor.h> //https://github.com/joshua-8/JMotor
 
+#include "pneumatics/compressorControllers/compressorControllerDigitalWrite.h"
 #include "pneumatics/pneumaticBoardController.h"
 #include "pneumatics/pneumaticClawController.h"
 #include "pneumatics/pressureSensors/pressureSensorAnalogRead.h"
@@ -14,64 +15,72 @@
 // pins
 const byte ONBOARD_LED = 2;
 const byte mainVoltageMonitorPin = 36;
+const byte pressurizeValvePin = 24;
+const byte ventValvePin = 25;
 
 // constants
 const float mainVoltageDACUnitsPerVolt = 380;
+const byte compressorOff = 2;
+const byte compressorNormal = 1;
+const byte compressorOverride = 0;
 
 // received variables
-boolean enabled = false;
-byte compressorMode = 2; // off
+bool enabled = false;
+byte compressorMode = compressorOff;
 float storedPressureSetpoint = 105;
-boolean clawAuto = false;
-boolean clawGrabAuto = false;
+bool clawAuto = false;
+bool clawGrabAuto = false;
 float clawAutoPressure = 0;
 float clawPressurizeVal = 0;
-boolean clawVentVal = true;
+bool clawVentVal = true;
 
 // sent variables
 float mainVoltage = 0;
 float storedPressure = 0;
 float workingPressure = 0;
 float clawPressure = 0;
-boolean compressing = false;
+bool compressing = false;
 float compressorDuty = 0;
 
 // objects
 JVoltageCompMeasure<10> mainVoltageComp = JVoltageCompMeasure<10>(mainVoltageMonitorPin, mainVoltageDACUnitsPerVolt);
 
-AnalogWriteValve clawPressurizeValve = AnalogWriteValve();
-DigitalWriteValve clawVentValve = DigitalWriteValve();
+PressureSensorAnalogRead storedPressureSensor = PressureSensorAnalogRead(35, 1.0, 0); // pin, calibration, zero
+PressureSensorAnalogRead workingPressureSensor = PressureSensorAnalogRead(36, 1.0); // pin, calibration, zero
+PressureSensorAnalogRead clawPressureSensor = PressureSensorAnalogRead(25, 1.0); // pin, calibration, zero
 
-PressureSensorAnalogRead storedPressureSensor = PressureSensorAnalogRead(35, 1.0);
-PressureSensorAnalogRead workingPressureSensor = PressureSensorAnalogRead(36, 1.0);
-// PressureSensor clawPressureSensor = PressureSensor();
+CompressorControllerDigitalWrite compressorController = CompressorControllerDigitalWrite(34, HIGH);
 
-PneumaticBoardController pBoard = PneumaticBoardController();
+PneumaticBoardController pBoard = PneumaticBoardController(compressorController);
+
+AnalogWriteValve clawPressurizeValve = AnalogWriteValve(pressurizeValvePin, false, LOW); // pin, reverse, disableState
+DigitalWriteValve clawVentValve = DigitalWriteValve(ventValvePin, false, LOW); // pin, reverse, disableState
+
 PneumaticClawController claw = PneumaticClawController(clawPressurizeValve, clawVentValve);
 
 // other variables
-boolean wasEnabled = false;
+bool wasEnabled = false;
 unsigned long lastMicros = 0;
 unsigned long loopTimeMicros = 0;
 
-void Enabled()
+inline void Enabled()
 {
 }
 
-void Enable()
+inline void Enable()
 {
 }
 
-void Disable()
+inline void Disable()
 {
 }
 
-void PowerOn()
+inline void PowerOn()
 {
     // runs once on robot startup, set pin modes and use begin() if applicable here
 }
 
-void Always()
+inline void Always()
 {
     unsigned long tempMicros = micros();
     loopTimeMicros = tempMicros - lastMicros;
@@ -106,7 +115,7 @@ void configWifi()
 
 void WifiDataToParse()
 {
-    // add data to read here: (EWD::recvBl, EWD::recvBy, EWD::recvIn, EWD::recvFl)(boolean, byte, int, float)
+    // add data to read here: (EWD::recvBl, EWD::recvBy, EWD::recvIn, EWD::recvFl)(bool, byte, int, float)
     enabled = EWD::recvBl();
     compressorMode = EWD::recvBy();
     storedPressureSetpoint = EWD::recvFl();
@@ -118,7 +127,7 @@ void WifiDataToParse()
 }
 void WifiDataToSend()
 {
-    // add data to send here: (EWD::sendBl(), EWD::sendBy(), EWD::sendIn(), EWD::sendFl())(boolean, byte, int, float)
+    // add data to send here: (EWD::sendBl(), EWD::sendBy(), EWD::sendIn(), EWD::sendFl())(bool, byte, int, float)
     EWD::sendFl(mainVoltage);
     EWD::sendFl(storedPressure);
     EWD::sendFl(workingPressure);
