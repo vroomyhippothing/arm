@@ -15,9 +15,9 @@ jobs:
       - uses: actions/checkout@v2
       - uses: arduino/arduino-lint-action@v1
         with:
+          path: ./src
           compliance: strict
           project-type: all
-          library-manager: submit
           recursive: true
           
 
