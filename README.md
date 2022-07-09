@@ -4,7 +4,7 @@
 
 ### This program controls a robotic arm.
 
-[![Lint](https://github.com/vroomyhippothing/impostor_arm/actions/workflows/Lint.yml/badge.svg)](https://github.com/vroomyhippothing/impostor_arm/actions/workflows/Lint.yml)
+[![CI](https://github.com/vroomyhippothing/arm/actions/workflows/CI.yml/badge.svg)](https://github.com/vroomyhippothing/arm/actions/workflows/CI.yml)
 
 Open in VSCode (using [PlatformIO](https://platformio.org/platformio-ide))
 
