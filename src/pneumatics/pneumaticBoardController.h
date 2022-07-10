@@ -2,6 +2,7 @@
 #define PNEUMATIC_BOARD_CONTROLLER_H
 // class for controlling our pneumatic board
 #include "compressorControllers/compressorController.h"
+#include "compressorModeConstants.h"
 #include "pneumatics/valves/digitalWriteValve.h"
 #include <Arduino.h>
 class PneumaticBoardController {
@@ -22,7 +23,7 @@ public:
     }
     void run(bool enabled, float storedPressure, float workingPressure, byte compressorMode, float storedPressureSetpoint)
     {
-        compressorController.setEnable(enabled); // kind of redundant, since compressing probably won't be true when disabled
+        compressorController.setEnable(enabled); // kind of redundant, since compressing probably shouldn't be true when disabled
         switch (compressorMode) {
         case compressorOverride:
             compressing = enabled;

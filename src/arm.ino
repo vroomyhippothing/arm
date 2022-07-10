@@ -55,7 +55,7 @@ PneumaticBoardController pBoard = PneumaticBoardController(compressorController,
 AnalogWriteValve clawPressurizeValve = AnalogWriteValve(pressurizeValvePin, false, LOW); // pin, reverse, disableState
 DigitalWriteValve clawVentValve = DigitalWriteValve(ventValvePin, false, LOW); // pin, reverse, disableState
 
-PneumaticClawController claw = PneumaticClawController(clawPressurizeValve, clawVentValve);
+PneumaticClawController claw = PneumaticClawController(clawPressurizeValve, clawVentValve, 5, 0.1);
 
 // other variables
 bool wasEnabled = false;
@@ -99,7 +99,7 @@ inline void Always()
     compressorDuty = pBoard.getCompressorDuty();
 
     // enabling and disabling is handled internally
-    claw.run(enabled, clawAuto, clawGrabAuto, clawPressurizeVal, clawVentVal, clawAutoPressure);
+    claw.run(enabled, clawPressure, clawAuto, clawGrabAuto, clawPressurizeVal, clawVentVal, clawAutoPressure);
 
     delay(1);
 }
@@ -140,6 +140,8 @@ void WifiDataToSend()
     EWD::sendFl(clawPressure);
     EWD::sendBl(compressing);
     EWD::sendFl(compressorDuty);
+    EWD::sendFl(clawPressurizeValve.getLastSetVal());
+    EWD::sendBl(clawVentValve.getLastSetVal());
 }
 
 ////////////////////////////// you don't need to edit below this line ////////////////////

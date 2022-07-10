@@ -6,6 +6,7 @@ class AnalogWriteValve : public AnalogValve {
 protected:
     bool enabled;
     byte pin;
+    float lastSetVal;
 
 public:
     /**
@@ -27,9 +28,11 @@ public:
         pin = _pin;
         reverse = _reverse;
         disableState = _disableState;
+        lastSetVal = 0.0;
     }
     void set(float _val)
     {
+        lastSetVal = _val;
         if (enabled) {
             if (reverse) {
                 _val = 1.0 - _val;
@@ -53,6 +56,10 @@ public:
                 analogWrite(pin, !disableState ? 0 : PWM_RANGE);
             }
         }
+    }
+    float getLastSetVal()
+    {
+        return lastSetVal;
     }
 };
 #endif // ANALOG_WRITE_VALVE_H

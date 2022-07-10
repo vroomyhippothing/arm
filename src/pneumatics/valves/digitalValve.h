@@ -5,5 +5,6 @@ class DigitalValve {
 public:
     virtual void setEnable(bool _enabled);
     virtual void set(bool _val);
+    virtual bool getLastSetVal();
 };
 #endif // DIGITAL_VALVE_H

@@ -6,6 +6,7 @@ class DigitalWriteValve : public DigitalValve {
 protected:
     bool enabled;
     byte pin;
+    bool lastSetVal;
 
 public:
     bool disableState = LOW;
@@ -22,9 +23,11 @@ public:
         pin = _pin;
         reverse = _reverse;
         disableState = _disableState;
+        lastSetVal = false;
     }
     void set(bool _val)
     {
+        lastSetVal = _val;
         if (enabled) {
             if (reverse) {
                 _val = !_val;
@@ -48,6 +51,10 @@ public:
                 digitalWrite(pin, disableState);
             }
         }
+    }
+    bool getLastSetVal()
+    {
+        return lastSetVal;
     }
 };
 
