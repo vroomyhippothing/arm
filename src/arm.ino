@@ -6,6 +6,7 @@
 #include <JMotor.h> //https://github.com/joshua-8/JMotor
 
 #include "pneumatics/compressorControllers/compressorControllerDigitalWrite.h"
+#include "pneumatics/compressorModeConstants.h"
 #include "pneumatics/pneumaticBoardController.h"
 #include "pneumatics/pneumaticClawController.h"
 #include "pneumatics/pressureSensors/pressureSensorAnalogRead.h"
@@ -21,10 +22,7 @@ const byte compressorPin = 25;
 
 // constants
 const float mainVoltageDACUnitsPerVolt = 380;
-const byte compressorOff = 2;
-const byte compressorNormal = 1;
-const byte compressorOverride = 0;
-
+const int compressorSetpointHysteresis = 15;
 // received variables
 bool enabled = false;
 byte compressorMode = compressorOff;
@@ -52,7 +50,7 @@ PressureSensorAnalogRead clawPressureSensor = PressureSensorAnalogRead(35, 60.0 
 
 CompressorControllerDigitalWrite compressorController = CompressorControllerDigitalWrite(compressorPin, HIGH);
 
-PneumaticBoardController pBoard = PneumaticBoardController(compressorController);
+PneumaticBoardController pBoard = PneumaticBoardController(compressorController, compressorSetpointHysteresis);
 
 AnalogWriteValve clawPressurizeValve = AnalogWriteValve(pressurizeValvePin, false, LOW); // pin, reverse, disableState
 DigitalWriteValve clawVentValve = DigitalWriteValve(ventValvePin, false, LOW); // pin, reverse, disableState
@@ -108,7 +106,7 @@ inline void Always()
 
 void configWifi()
 {
-    int signalLossTimeout = 500;
+    int signalLossTimeout = 250;
 
     // EWD::mode = EWD::Mode::connectToNetwork;
     // EWD::routerName = "router";
