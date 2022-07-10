@@ -12,6 +12,7 @@ protected:
     CompressorController& compressorController;
 
     int compressorSetpointHysteresis;
+    unsigned long lastDutyCycleCalculation;
 
 public:
     PneumaticBoardController(CompressorController& _compressorController, int _compressorSetpointHysteresis /*dutyCycle limit and other settings?*/)
@@ -20,6 +21,7 @@ public:
         compressorSetpointHysteresis = _compressorSetpointHysteresis;
         compressing = false;
         compressorDuty = 0.0;
+        lastDutyCycleCalculation = 0;
     }
     void run(bool enabled, float storedPressure, float workingPressure, byte compressorMode, float storedPressureSetpoint)
     {
@@ -43,6 +45,17 @@ public:
             compressing = false;
             break;
         }
+
+        // duty cycle calculation
+        if (millis() - lastDutyCycleCalculation > 100) {
+            if (enabled && compressing) {
+                compressorDuty += (1.0 - compressorDuty) * (millis() - lastDutyCycleCalculation) / 1000.0 / (55.0 * 60);
+            } else {
+                compressorDuty += (0.0 - compressorDuty) * (millis() - lastDutyCycleCalculation) / 1000.0 / (55.0 * 60);
+            }
+            lastDutyCycleCalculation = millis();
+        }
+
         compressorController.setCompressor(compressing);
     }
     bool isCompressorOn()

@@ -106,7 +106,7 @@ inline void Always()
 
 void configWifi()
 {
-    int signalLossTimeout = 250;
+    int signalLossTimeout = 500;
 
     // EWD::mode = EWD::Mode::connectToNetwork;
     // EWD::routerName = "router";
