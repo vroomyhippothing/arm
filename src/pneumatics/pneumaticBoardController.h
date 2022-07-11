@@ -35,9 +35,9 @@ public:
         // duty cycle calculation
         if (millis() - lastDutyCycleCalculation > 100) {
             if (enabled && compressing) {
-                compressorDuty += (1.0 - compressorDuty) * (millis() - lastDutyCycleCalculation) / 1000.0 / (55.0 /* * 60*/);
+                compressorDuty += (1.0 - compressorDuty) * (millis() - lastDutyCycleCalculation) / 1000.0 / (55.0 * 60);
             } else {
-                compressorDuty += (0.0 - compressorDuty) * (millis() - lastDutyCycleCalculation) / 1000.0 / (55.0 /* * 60*/);
+                compressorDuty += (0.0 - compressorDuty) * (millis() - lastDutyCycleCalculation) / 1000.0 / (55.0 * 60);
             }
             lastDutyCycleCalculation = millis();
         }
