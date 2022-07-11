@@ -23,6 +23,8 @@ const byte compressorPin = 25;
 // constants
 const float mainVoltageDACUnitsPerVolt = 380;
 const int compressorSetpointHysteresis = 15;
+const float compressorDutyLimit = 9;
+const float compressorDutyBounds = 4;
 // received variables
 bool enabled = false;
 byte compressorMode = compressorOff;
@@ -50,7 +52,7 @@ PressureSensorAnalogRead clawPressureSensor = PressureSensorAnalogRead(35, 60.0 
 
 CompressorControllerDigitalWrite compressorController = CompressorControllerDigitalWrite(compressorPin, HIGH);
 
-PneumaticBoardController pBoard = PneumaticBoardController(compressorController, compressorSetpointHysteresis);
+PneumaticBoardController pBoard = PneumaticBoardController(compressorController, compressorSetpointHysteresis, compressorDutyLimit, compressorDutyBounds);
 
 AnalogWriteValve clawPressurizeValve = AnalogWriteValve(pressurizeValvePin, false, LOW); // pin, reverse, disableState
 DigitalWriteValve clawVentValve = DigitalWriteValve(ventValvePin, false, LOW); // pin, reverse, disableState
@@ -142,6 +144,7 @@ void WifiDataToSend()
     EWD::sendFl(compressorDuty);
     EWD::sendFl(clawPressurizeValve.getLastSetVal());
     EWD::sendBl(clawVentValve.getLastSetVal());
+    EWD::sendBl(pBoard.isCompressorOverDutyCycle());
 }
 
 ////////////////////////////// you don't need to edit below this line ////////////////////
