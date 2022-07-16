@@ -26,6 +26,7 @@ const float mainVoltageDACUnitsPerVolt = 380;
 const int compressorSetpointHysteresis = 15;
 const float compressorDutyLimit = 9;
 const float compressorDutyBounds = 4;
+
 // received variables
 bool enabled = false;
 byte compressorMode = compressorOff;
@@ -44,24 +45,23 @@ float clawPressure = 0;
 bool compressing = false;
 float compressorDuty = 0;
 
-// objects
+////////////////////MOTORS////////////////////
 JVoltageCompMeasure<10> mainVoltageComp = JVoltageCompMeasure<10>(mainVoltageMonitorPin, mainVoltageDACUnitsPerVolt);
 
+////////////////////PNEUMATICS////////////////////
 PressureSensorAnalogRead storedPressureSensor = PressureSensorAnalogRead(39, 120.0 / 2210, 15); // pin, calibration, zero
-
 PressureSensorAnalogRead workingPressureSensor = PressureSensorAnalogRead(34, 60.0 / 1365, 55); // pin, calibration, zero
 // PressureSensorHX711 workingPressureSensor = PressureSensorHX711(19, 18, 0.0001); // dt, sck
-
 PressureSensorAnalogRead clawPressureSensor = PressureSensorAnalogRead(35, 60.0 / 2635, 260); // pin, calibration, zero
 
 CompressorControllerDigitalWrite compressorController = CompressorControllerDigitalWrite(compressorPin, HIGH);
-
 PneumaticBoardController pBoard = PneumaticBoardController(compressorController, compressorSetpointHysteresis, compressorDutyLimit, compressorDutyBounds);
 
 AnalogWriteValve clawPressurizeValve = AnalogWriteValve(pressurizeValvePin, false, LOW); // pin, reverse, disableState
 DigitalWriteValve clawVentValve = DigitalWriteValve(ventValvePin, false, LOW); // pin, reverse, disableState
-
 PneumaticClawController claw = PneumaticClawController(clawPressurizeValve, clawVentValve, 5, 0.1);
+
+////////////////////
 
 // other variables
 bool wasEnabled = false;
