@@ -4,7 +4,6 @@
 class PressureSensor {
 protected:
     float pressure;
-    float calibration;
 
 public:
     virtual void begin();
@@ -12,6 +11,7 @@ public:
     /**
      * @brief
      * @note  call run() first to get an updated value
+     * @param _run, if this is true, this function calls run for you
      * @retval
      */
     float getPressure(bool _run = false)
@@ -20,14 +20,6 @@ public:
             run();
         }
         return pressure;
-    }
-    /**
-     * @brief  the raw value read is multiplied by _calibration value to get pressure
-     * @param  _calibration:
-     */
-    void setCalibration(float _calibration)
-    {
-        calibration = _calibration;
     }
 };
 

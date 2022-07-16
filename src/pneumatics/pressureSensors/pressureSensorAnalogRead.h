@@ -4,6 +4,7 @@
 class PressureSensorAnalogRead : public PressureSensor {
 protected:
     byte pin;
+    float calibration;
     int zero;
 
 public:
@@ -26,6 +27,22 @@ public:
     void run()
     {
         pressure = (analogRead(pin) - zero) * calibration;
+    }
+    /**
+     * @brief  the raw value read is multiplied by _calibration value to get pressure
+     * @param  _calibration:
+     */
+    void setCalibration(float _calibration)
+    {
+        calibration = _calibration;
+    }
+    /**
+     * @brief  the raw value read when the pressure is zero
+     * @param  _zero:
+     */
+    void setZero(float _zero)
+    {
+        zero = _zero;
     }
 };
 

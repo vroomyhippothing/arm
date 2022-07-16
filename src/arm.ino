@@ -10,6 +10,7 @@
 #include "pneumatics/pneumaticBoardController.h"
 #include "pneumatics/pneumaticClawController.h"
 #include "pneumatics/pressureSensors/pressureSensorAnalogRead.h"
+#include "pneumatics/pressureSensors/pressureSensorHX711.h"
 #include "pneumatics/valves/analogWriteValve.h"
 #include "pneumatics/valves/digitalWriteValve.h"
 
@@ -47,7 +48,10 @@ float compressorDuty = 0;
 JVoltageCompMeasure<10> mainVoltageComp = JVoltageCompMeasure<10>(mainVoltageMonitorPin, mainVoltageDACUnitsPerVolt);
 
 PressureSensorAnalogRead storedPressureSensor = PressureSensorAnalogRead(39, 120.0 / 2210, 15); // pin, calibration, zero
+
 PressureSensorAnalogRead workingPressureSensor = PressureSensorAnalogRead(34, 60.0 / 1365, 55); // pin, calibration, zero
+// PressureSensorHX711 workingPressureSensor = PressureSensorHX711(19, 18, 0.0001); // dt, sck
+
 PressureSensorAnalogRead clawPressureSensor = PressureSensorAnalogRead(35, 60.0 / 2635, 260); // pin, calibration, zero
 
 CompressorControllerDigitalWrite compressorController = CompressorControllerDigitalWrite(compressorPin, HIGH);
@@ -108,7 +112,7 @@ inline void Always()
 
 void configWifi()
 {
-    int signalLossTimeout = 500;
+    int signalLossTimeout = 125;
 
     // EWD::mode = EWD::Mode::connectToNetwork;
     // EWD::routerName = "router";
