@@ -49,10 +49,9 @@ float compressorDuty = 0;
 JVoltageCompMeasure<10> mainVoltageComp = JVoltageCompMeasure<10>(mainVoltageMonitorPin, mainVoltageDACUnitsPerVolt);
 
 ////////////////////PNEUMATICS////////////////////
-PressureSensorAnalogRead storedPressureSensor = PressureSensorAnalogRead(39, 120.0 / 2210, 15); // pin, calibration, zero
-PressureSensorAnalogRead workingPressureSensor = PressureSensorAnalogRead(34, 60.0 / 1365, 55); // pin, calibration, zero
-// PressureSensorHX711 workingPressureSensor = PressureSensorHX711(19, 18, 0.0001); // dt, sck
-PressureSensorAnalogRead clawPressureSensor = PressureSensorAnalogRead(35, 60.0 / 2635, 260); // pin, calibration, zero
+PressureSensorHX711 clawPressureSensor = PressureSensorHX711(26, 27, -0.00001, 2300000, 1); // dt, sck, calibration, zero, numMeasurements
+PressureSensorHX711 workingPressureSensor = PressureSensorHX711(14, 12, -0.00001, 2300000, 1); // dt, sck, calibration, zero, numMeasurements
+PressureSensorAnalogRead storedPressureSensor = PressureSensorAnalogRead(39, 1, 0); // pin, calibration, zero
 
 CompressorControllerDigitalWrite compressorController = CompressorControllerDigitalWrite(compressorPin, HIGH);
 PneumaticBoardController pBoard = PneumaticBoardController(compressorController, compressorSetpointHysteresis, compressorDutyLimit, compressorDutyBounds);
@@ -83,6 +82,7 @@ inline void Disable()
 inline void PowerOn()
 {
     // runs once on robot startup, set pin modes and use begin() if applicable here
+    analogReadResolution(12);
     storedPressureSensor.begin();
     workingPressureSensor.begin();
     clawPressureSensor.begin();
@@ -114,15 +114,15 @@ void configWifi()
 {
     int signalLossTimeout = 125;
 
-    // EWD::mode = EWD::Mode::connectToNetwork;
-    // EWD::routerName = "router";
-    // EWD::routerPassword = "password";
-    // EWD::routerPort = 25210;
+    EWD::mode = EWD::Mode::connectToNetwork;
+    EWD::routerName = "router";
+    EWD::routerPassword = "password";
+    EWD::routerPort = 25210;
 
-    EWD::mode = EWD::Mode::createAP;
-    EWD::APName = "arm";
-    EWD::APPassword = "password";
-    EWD::APPort = 25210;
+    // EWD::mode = EWD::Mode::createAP;
+    // EWD::APName = "arm";
+    // EWD::APPassword = "password";
+    // EWD::APPort = 25210;
 }
 
 void WifiDataToParse()

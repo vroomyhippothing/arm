@@ -15,8 +15,10 @@ public:
      * @param  _pinD: hx711 data pin
      * @param  _pinC: hx711 clock pin
      * @param  _calibration: pressurePerDACUnits, the value read through analogRead is multiplied by this value to get pressure, float, default=1.0
+     * @param  _zero: the raw value read when the pressure is zero, default=0
+     * @param  _numMeasurements how many measurements should the HX711 library be told to average?, default=1
      */
-    PressureSensorHX711(byte _pinD, byte _pinC, float _calibration = 1.0, int _zero = 0, byte _numMeasurements = 1)
+    PressureSensorHX711(byte _pinD, byte _pinC, float _calibration = 1.0, long _zero = 0, byte _numMeasurements = 1)
     {
         pinD = _pinD;
         pinC = _pinC;
@@ -48,7 +50,7 @@ public:
      * @brief  the raw value read when the pressure is zero
      * @param  _zero:
      */
-    void setZero(float _zero)
+    void setZero(long _zero)
     {
         pressureSensor.set_offset(_zero);
     }
