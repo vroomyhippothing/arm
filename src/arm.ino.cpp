@@ -1,9 +1,12 @@
+# 1 "C:\\Users\\Joshua\\AppData\\Local\\Temp\\tmphw1ppvn6"
+#include <Arduino.h>
+# 1 "C:/Users/Joshua/Desktop/arm-git/arm/src/arm.ino"
 
 #include <Arduino.h>
 #define EWDmaxWifiSendBufSize 200
 #define EWDmaxWifiRecvBufSize 200
-#include <ESP32_easy_wifi_data.h> //https://github.com/joshua-8/ESP32_easy_wifi_data
-#include <JMotor.h> //https://github.com/joshua-8/JMotor
+#include <ESP32_easy_wifi_data.h>
+#include <JMotor.h>
 
 #include "pneumatics/compressorControllers/compressorControllerDigitalWrite.h"
 #include "pneumatics/compressorModeConstants.h"
@@ -14,7 +17,7 @@
 #include "pneumatics/valves/analogWriteValve.h"
 #include "pneumatics/valves/digitalWriteValve.h"
 
-// pins
+
 const byte ONBOARD_LED = 2;
 const byte mainVoltageMonitorPin = 36;
 const byte pressurizeValvePin = 32;
@@ -26,13 +29,13 @@ const byte workingPressureSensorDTPin = 14;
 const byte workingPressureSensorSCKPin = 12;
 const byte storedPressureSensorPin = 39;
 
-// constants
+
 const float mainVoltageDACUnitsPerVolt = 380;
 const int compressorSetpointHysteresis = 15;
 const float compressorDutyLimit = 9;
 const float compressorDutyBounds = 4;
 
-// received variables
+
 bool enabled = false;
 byte compressorMode = compressorOff;
 float storedPressureSetpoint = 105;
@@ -42,7 +45,7 @@ float clawAutoPressure = 0;
 float clawPressurizeVal = 0;
 bool clawVentVal = true;
 
-// sent variables
+
 float mainVoltage = 0;
 float storedPressure = 0;
 float workingPressure = 0;
@@ -50,28 +53,38 @@ float clawPressure = 0;
 bool compressing = false;
 float compressorDuty = 0;
 
-////////////////////MOTORS////////////////////
+
 JVoltageCompMeasure<10> mainVoltageComp = JVoltageCompMeasure<10>(mainVoltageMonitorPin, mainVoltageDACUnitsPerVolt);
 
-////////////////////PNEUMATICS////////////////////
-PressureSensorHX711 clawPressureSensor = PressureSensorHX711(clawPressureSensorDTPin, clawPressureSensorSCKPin, -0.000001, -614000, 1); // dt, sck, calibration, zero, numMeasurements
-PressureSensorHX711 workingPressureSensor = PressureSensorHX711(workingPressureSensorDTPin, workingPressureSensorSCKPin, -0.000001, 232700, 1); // dt, sck, calibration, zero, numMeasurements
-PressureSensorAnalogRead storedPressureSensor = PressureSensorAnalogRead(storedPressureSensorPin, 0.0615, 255); // pin, calibration, zero
+
+PressureSensorHX711 clawPressureSensor = PressureSensorHX711(clawPressureSensorDTPin, clawPressureSensorSCKPin, -0.000001, -614000, 1);
+PressureSensorHX711 workingPressureSensor = PressureSensorHX711(workingPressureSensorDTPin, workingPressureSensorSCKPin, -0.000001, 232700, 1);
+PressureSensorAnalogRead storedPressureSensor = PressureSensorAnalogRead(storedPressureSensorPin, 0.0615, 255);
 
 CompressorControllerDigitalWrite compressorController = CompressorControllerDigitalWrite(compressorPin, HIGH);
 PneumaticBoardController pBoard = PneumaticBoardController(compressorController, compressorSetpointHysteresis, compressorDutyLimit, compressorDutyBounds);
 
-AnalogWriteValve clawPressurizeValve = AnalogWriteValve(pressurizeValvePin, false, LOW); // pin, reverse, disableState
-DigitalWriteValve clawVentValve = DigitalWriteValve(ventValvePin, false, LOW); // pin, reverse, disableState
+AnalogWriteValve clawPressurizeValve = AnalogWriteValve(pressurizeValvePin, false, LOW);
+DigitalWriteValve clawVentValve = DigitalWriteValve(ventValvePin, false, LOW);
 PneumaticClawController claw = PneumaticClawController(clawPressurizeValve, clawVentValve, 5, 0.1);
 
-////////////////////
 
-// other variables
+
+
 bool wasEnabled = false;
 unsigned long lastMicros = 0;
 unsigned long loopTimeMicros = 0;
-
+inline void Enabled();
+inline void Enable();
+inline void Disable();
+inline void PowerOn();
+inline void Always();
+void configWifi();
+void WifiDataToParse();
+void WifiDataToSend();
+void setup();
+void loop();
+#line 75 "C:/Users/Joshua/Desktop/arm-git/arm/src/arm.ino"
 inline void Enabled()
 {
 }
@@ -86,7 +99,7 @@ inline void Disable()
 
 inline void PowerOn()
 {
-    // runs once on robot startup, set pin modes and use begin() if applicable here
+
     analogReadResolution(12);
     storedPressureSensor.begin();
     workingPressureSensor.begin();
@@ -104,12 +117,12 @@ inline void Always()
     workingPressure = workingPressureSensor.getPressure(true);
     clawPressure = clawPressureSensor.getPressure(true);
 
-    // enabling and disabling is handled internally
+
     pBoard.run(enabled, storedPressure, workingPressure, compressorMode, storedPressureSetpoint);
     compressing = pBoard.isCompressorOn();
     compressorDuty = pBoard.getCompressorDuty();
 
-    // enabling and disabling is handled internally
+
     claw.run(enabled, clawPressure, clawAuto, clawGrabAuto, clawPressurizeVal, clawVentVal, clawAutoPressure);
 
     delay(1);
@@ -124,15 +137,15 @@ void configWifi()
     EWD::routerPassword = "password";
     EWD::routerPort = 25210;
 
-    // EWD::mode = EWD::Mode::createAP;
-    // EWD::APName = "arm";
-    // EWD::APPassword = "password";
-    // EWD::APPort = 25210;
+
+
+
+
 }
 
 void WifiDataToParse()
 {
-    // add data to read here: (EWD::recvBl, EWD::recvBy, EWD::recvIn, EWD::recvFl)(bool, byte, int, float)
+
     enabled = EWD::recvBl();
     compressorMode = EWD::recvBy();
     storedPressureSetpoint = EWD::recvFl();
@@ -144,7 +157,7 @@ void WifiDataToParse()
 }
 void WifiDataToSend()
 {
-    // add data to send here: (EWD::sendBl(), EWD::sendBy(), EWD::sendIn(), EWD::sendFl())(bool, byte, int, float)
+
     EWD::sendFl(mainVoltage);
     EWD::sendFl(storedPressure);
     EWD::sendFl(workingPressure);
@@ -156,7 +169,7 @@ void WifiDataToSend()
     EWD::sendBl(pBoard.isCompressorOverDutyCycle());
 }
 
-////////////////////////////// you don't need to edit below this line ////////////////////
+
 
 void setup()
 {
@@ -183,14 +196,14 @@ void loop()
     }
     if (enabled) {
         Enabled();
-        digitalWrite(ONBOARD_LED, millis() % 500 < 250); // flash, enabled
+        digitalWrite(ONBOARD_LED, millis() % 500 < 250);
     } else {
         if (!EWD::wifiConnected)
-            digitalWrite(ONBOARD_LED, millis() % 1000 <= 100); // short flash, wifi connection fail
+            digitalWrite(ONBOARD_LED, millis() % 1000 <= 100);
         else if (EWD::timedOut())
-            digitalWrite(ONBOARD_LED, millis() % 1000 >= 100); // long flash, no driver station connected
+            digitalWrite(ONBOARD_LED, millis() % 1000 >= 100);
         else
-            digitalWrite(ONBOARD_LED, HIGH); // on, disabled
+            digitalWrite(ONBOARD_LED, HIGH);
     }
     wasEnabled = enabled;
 }
