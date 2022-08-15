@@ -54,8 +54,8 @@ float compressorDuty = 0;
 JVoltageCompMeasure<10> mainVoltageComp = JVoltageCompMeasure<10>(mainVoltageMonitorPin, mainVoltageDACUnitsPerVolt);
 
 ////////////////////PNEUMATICS////////////////////
-PressureSensorHX711 clawPressureSensor = PressureSensorHX711(clawPressureSensorDTPin, clawPressureSensorSCKPin, -0.000001, -614000, 1); // dt, sck, calibration, zero, numMeasurements
-PressureSensorHX711 workingPressureSensor = PressureSensorHX711(workingPressureSensorDTPin, workingPressureSensorSCKPin, -0.000001, 2308000, 1); // dt, sck, calibration, zero, numMeasurements
+PressureSensorHX711 clawPressureSensor = PressureSensorHX711(clawPressureSensorDTPin, clawPressureSensorSCKPin, -0.000003, -614000, 1); // dt, sck, calibration, zero, numMeasurements
+PressureSensorHX711 workingPressureSensor = PressureSensorHX711(workingPressureSensorDTPin, workingPressureSensorSCKPin, -0.000003, 2308000, 1); // dt, sck, calibration, zero, numMeasurements
 PressureSensorAnalogRead storedPressureSensor = PressureSensorAnalogRead(storedPressureSensorPin, 0.059, 255); // pin, calibration, zero
 
 CompressorControllerDigitalWrite compressorController = CompressorControllerDigitalWrite(compressorPin, HIGH);
@@ -63,7 +63,7 @@ PneumaticBoardController pBoard = PneumaticBoardController(compressorController,
 
 AnalogWriteValve clawPressurizeValve = AnalogWriteValve(pressurizeValvePin, false, LOW); // pin, reverse, disableState
 DigitalWriteValve clawVentValve = DigitalWriteValve(ventValvePin, false, LOW); // pin, reverse, disableState
-PneumaticClawController claw = PneumaticClawController(clawPressurizeValve, clawVentValve, 5, 0.1);
+PneumaticClawController claw = PneumaticClawController(clawPressurizeValve, clawVentValve, .1, 0.02); // hysteresis, P
 
 ////////////////////
 
