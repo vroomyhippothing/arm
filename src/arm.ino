@@ -63,7 +63,7 @@ PneumaticBoardController pBoard = PneumaticBoardController(compressorController,
 
 AnalogWriteValve clawPressurizeValve = AnalogWriteValve(pressurizeValvePin, false, LOW); // pin, reverse, disableState
 DigitalWriteValve clawVentValve = DigitalWriteValve(ventValvePin, false, LOW); // pin, reverse, disableState
-PneumaticClawController claw = PneumaticClawController(clawPressurizeValve, clawVentValve, .1, 0.08); // hysteresis, P
+PneumaticClawController claw = PneumaticClawController(clawPressurizeValve, clawVentValve, .1, 0.04, 0.3); // hysteresis, P, valve offset
 
 ////////////////////
 

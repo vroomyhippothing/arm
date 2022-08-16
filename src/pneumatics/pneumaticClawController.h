@@ -11,14 +11,16 @@ protected:
     DigitalValve& ventValve;
     float clawAutoPressureHysteresis;
     float clawAutoPressureP;
+    float clawValveOffset;
 
 public:
-    PneumaticClawController(AnalogValve& _pressurizeValve, DigitalValve& _ventValve, float _clawAutoPressureHysteresis, float _clawAutoPressureP)
+    PneumaticClawController(AnalogValve& _pressurizeValve, DigitalValve& _ventValve, float _clawAutoPressureHysteresis, float _clawAutoPressureP, float _clawValveOffset)
         : pressurizeValve(_pressurizeValve)
         , ventValve(_ventValve)
     {
         clawAutoPressureHysteresis = _clawAutoPressureHysteresis;
         clawAutoPressureP = _clawAutoPressureP;
+        clawValveOffset = _clawValveOffset;
     }
     void run(bool enabled, float clawPressure, bool clawAuto, bool clawGrabAuto, float clawPressurizeVal, bool clawVentVal, float clawAutoPressure)
     {
@@ -39,7 +41,7 @@ public:
                 if (clawPressure < clawAutoPressure) {
                     ventValve.set(false);
                 }
-                pressurizeValve.set(constrain((clawAutoPressure - clawPressure) * clawAutoPressureP, 0, 1));
+                pressurizeValve.set(constrain((clawAutoPressure - clawPressure) * clawAutoPressureP + clawValveOffset, 0, 1));
             }
         }
     }
