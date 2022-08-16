@@ -29,7 +29,7 @@ public:
     }
     void begin()
     {
-        pressureSensor.begin(pinD, pinC); // hx711 DT, SCK
+        pressureSensor.begin(pinD, pinC, 64); // hx711 DT, SCK, gain
     }
     void run()
     {

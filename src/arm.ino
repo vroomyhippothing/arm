@@ -54,8 +54,8 @@ float compressorDuty = 0;
 JVoltageCompMeasure<10> mainVoltageComp = JVoltageCompMeasure<10>(mainVoltageMonitorPin, mainVoltageDACUnitsPerVolt);
 
 ////////////////////PNEUMATICS////////////////////
-PressureSensorHX711 clawPressureSensor = PressureSensorHX711(clawPressureSensorDTPin, clawPressureSensorSCKPin, -0.000003, -614000, 1); // dt, sck, calibration, zero, numMeasurements
-PressureSensorHX711 workingPressureSensor = PressureSensorHX711(workingPressureSensorDTPin, workingPressureSensorSCKPin, -0.000003, 2308000, 1); // dt, sck, calibration, zero, numMeasurements
+PressureSensorHX711 clawPressureSensor = PressureSensorHX711(clawPressureSensorDTPin, clawPressureSensorSCKPin, -8.02467E-6, 746000, 1); // dt, sck, calibration, zero, numMeasurements
+PressureSensorHX711 workingPressureSensor = PressureSensorHX711(workingPressureSensorDTPin, workingPressureSensorSCKPin, -8.37403E-6, -202100, 1); // dt, sck, calibration, zero, numMeasurements
 PressureSensorAnalogRead storedPressureSensor = PressureSensorAnalogRead(storedPressureSensorPin, 0.059, 255); // pin, calibration, zero
 
 CompressorControllerDigitalWrite compressorController = CompressorControllerDigitalWrite(compressorPin, HIGH);
