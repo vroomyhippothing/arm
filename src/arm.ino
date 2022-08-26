@@ -8,7 +8,7 @@
 #include "pneumatics/compressorControllers/compressorControllerDigitalWrite.h"
 #include "pneumatics/compressorModeConstants.h"
 #include "pneumatics/pneumaticBoardController.h"
-#include "pneumatics/pneumaticClawController.h"
+#include "pneumatics/pneumaticClawController2.h"
 #include "pneumatics/pressureSensors/pressureSensorAnalogRead.h"
 #include "pneumatics/pressureSensors/pressureSensorHX711.h"
 #include "pneumatics/valves/analogWriteValve.h"
@@ -17,8 +17,9 @@
 // pins
 const byte ONBOARD_LED = 2;
 const byte mainVoltageMonitorPin = 36;
-const byte pressurizeValvePin = 32;
+const byte rateValvePin = 32;
 const byte ventValvePin = 33;
+const byte presValvePin = 13;
 const byte compressorPin = 25;
 const byte clawPressureSensorDTPin = 26;
 const byte clawPressureSensorSCKPin = 27;
@@ -39,8 +40,9 @@ float storedPressureSetpoint = 105;
 bool clawAuto = false;
 bool clawGrabAuto = false;
 float clawAutoPressure = 0;
-float clawPressurizeVal = 0;
-bool clawVentVal = true;
+float clawRateVal = 0;
+bool clawPresVal = false;
+bool clawVentVal = false;
 
 // sent variables
 float mainVoltage = 0;
@@ -61,9 +63,10 @@ PressureSensorAnalogRead storedPressureSensor = PressureSensorAnalogRead(storedP
 CompressorControllerDigitalWrite compressorController = CompressorControllerDigitalWrite(compressorPin, HIGH);
 PneumaticBoardController pBoard = PneumaticBoardController(compressorController, compressorSetpointHysteresis, compressorDutyLimit, compressorDutyBounds);
 
-AnalogWriteValve clawPressurizeValve = AnalogWriteValve(pressurizeValvePin, false, LOW); // pin, reverse, disableState
+AnalogWriteValve clawRateValve = AnalogWriteValve(rateValvePin, false, LOW); // pin, reverse, disableState
+DigitalWriteValve clawPresValve = DigitalWriteValve(presValvePin, false, LOW); // pin, reverse, disableState
 DigitalWriteValve clawVentValve = DigitalWriteValve(ventValvePin, false, LOW); // pin, reverse, disableState
-PneumaticClawController claw = PneumaticClawController(clawPressurizeValve, clawVentValve, .1, 0.04, 0.3); // hysteresis, P, valve offset
+PneumaticClawController2 claw = PneumaticClawController2(clawPresValve, clawVentValve, clawRateValve);
 
 ////////////////////
 
@@ -110,7 +113,7 @@ inline void Always()
     compressorDuty = pBoard.getCompressorDuty();
 
     // enabling and disabling is handled internally
-    claw.run(enabled, clawPressure, clawAuto, clawGrabAuto, clawPressurizeVal, clawVentVal, clawAutoPressure);
+    claw.run(enabled, clawPressure, clawAuto, clawGrabAuto, clawPresVal, clawVentVal, clawRateVal, clawAutoPressure);
 
     delay(1);
 }
@@ -139,7 +142,8 @@ void WifiDataToParse()
     clawAuto = EWD::recvBl();
     clawGrabAuto = EWD::recvBl();
     clawAutoPressure = EWD::recvFl();
-    clawPressurizeVal = EWD::recvFl();
+    clawRateVal = EWD::recvFl();
+    clawPresVal = EWD::recvBl();
     clawVentVal = EWD::recvBl();
 }
 void WifiDataToSend()
@@ -151,7 +155,8 @@ void WifiDataToSend()
     EWD::sendFl(clawPressure);
     EWD::sendBl(compressing);
     EWD::sendFl(compressorDuty);
-    EWD::sendFl(clawPressurizeValve.getLastSetVal());
+    EWD::sendFl(clawRateValve.getLastSetVal());
+    EWD::sendBl(clawPresValve.getLastSetVal());
     EWD::sendBl(clawVentValve.getLastSetVal());
     EWD::sendBl(pBoard.isCompressorOverDutyCycle());
 }
