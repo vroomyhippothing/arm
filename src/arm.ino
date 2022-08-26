@@ -32,6 +32,9 @@ const float mainVoltageDACUnitsPerVolt = 380;
 const int compressorSetpointHysteresis = 15;
 const float compressorDutyLimit = 9;
 const float compressorDutyBounds = 4;
+// (received constants)
+float pressureDeadzone = 0;
+float autoP = 0;
 
 // received variables
 bool enabled = false;
@@ -113,7 +116,7 @@ inline void Always()
     compressorDuty = pBoard.getCompressorDuty();
 
     // enabling and disabling is handled internally
-    claw.run(enabled, clawPressure, clawAuto, clawGrabAuto, clawPresVal, clawVentVal, clawRateVal, clawAutoPressure);
+    claw.run(enabled, clawPressure, clawAuto, clawGrabAuto, clawPresVal, clawVentVal, clawRateVal, clawAutoPressure, pressureDeadzone, autoP);
 
     delay(1);
 }
@@ -124,7 +127,7 @@ void configWifi()
 
     EWD::mode = EWD::Mode::connectToNetwork;
     EWD::routerName = "router";
-    EWD::routerPassword = "password";
+    EWD::routerPassword = "networkPassword";
     EWD::routerPort = 25210;
 
     // EWD::mode = EWD::Mode::createAP;
@@ -145,6 +148,8 @@ void WifiDataToParse()
     clawRateVal = EWD::recvFl();
     clawPresVal = EWD::recvBl();
     clawVentVal = EWD::recvBl();
+    pressureDeadzone = EWD::recvFl();
+    autoP = EWD::recvFl();
 }
 void WifiDataToSend()
 {

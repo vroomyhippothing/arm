@@ -55,12 +55,11 @@ public:
             if (!enabled) {
                 compressing = false;
             } else { // enabled
-                // TODO: restore pressure setpoint code? (if the stored pressure sensor never needs to be overridden? or add 4th mode?)
-                //  if (storedPressure < storedPressureSetpoint - compressorSetpointHysteresis) {
-                compressing = true;
-                // } else if (storedPressure >= storedPressureSetpoint) {
-                // compressing = false;
-                // }
+                if (storedPressure < storedPressureSetpoint - compressorSetpointHysteresis) {
+                    compressing = true;
+                } else if (storedPressure >= storedPressureSetpoint) {
+                    compressing = false;
+                }
             }
 
             break;

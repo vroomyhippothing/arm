@@ -18,8 +18,9 @@ public:
         , rateValve(_rateValve)
     {
     }
-    void run(bool enabled, float clawPressure, bool clawAuto, bool clawGrabAuto, bool clawPresVal, bool clawVentVal, float clawRateVal, float clawAutoPressure)
+    void run(bool enabled, float clawPressure, bool clawAuto, bool clawGrabAuto, bool clawPresVal, bool clawVentVal, float clawRateVal, float clawAutoPressure, float pressureDeadzone, float autoP)
     {
+        pressureDeadzone = abs(pressureDeadzone);
         presValve.setEnable(enabled);
         ventValve.setEnable(enabled);
         rateValve.setEnable(enabled);
@@ -33,9 +34,26 @@ public:
                 presValve.set(false);
                 ventValve.set(true);
             } else { // close claw. This is the code that pressurizes the claw to a setpoint.
-                rateValve.set(0.8);
-                presValve.set(true);
-                ventValve.set(false);
+                if (clawPressure > clawAutoPressure) {
+                    presValve.set(false);
+                    if (clawPressure > clawAutoPressure + pressureDeadzone) {
+                        ventValve.set(true);
+                        // venting, air starts moving at 0.4@50, 0.5@0
+                        // TODO: MOVE VALVE COMPENSATION CONSTANTS OUTSIDE OF THIS CLASS
+                        rateValve.set(constrain((clawPressure - (clawAutoPressure)) * autoP + (0.5 - 0.1 * clawPressure / 50), 0, 1));
+                    } else {
+                        rateValve.set(0);
+                    }
+                } else { // claw pressure <= setpoint
+                    ventValve.set(false);
+                    if (clawPressure < clawAutoPressure - pressureDeadzone) {
+                        presValve.set(true);
+                        // pressurizing, air starts moving at 0.54@0, 0.49@50
+                        rateValve.set(constrain((clawPressure - (clawAutoPressure)) * -autoP + (0.54 - 0.05 * clawPressure / 50), 0, 1));
+                    } else {
+                        rateValve.set(0);
+                    }
+                }
             }
         }
     }
