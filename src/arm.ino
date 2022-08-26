@@ -126,8 +126,8 @@ void configWifi()
     int signalLossTimeout = 125;
 
     EWD::mode = EWD::Mode::connectToNetwork;
-    EWD::routerName = "router";
-    EWD::routerPassword = "networkPassword";
+    EWD::routerName = "chicken";
+    EWD::routerPassword = "bawkbawk";
     EWD::routerPort = 25210;
 
     // EWD::mode = EWD::Mode::createAP;
