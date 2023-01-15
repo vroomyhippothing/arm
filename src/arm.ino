@@ -125,15 +125,15 @@ void configWifi()
 {
     int signalLossTimeout = 125;
 
-    // EWD::mode = EWD::Mode::connectToNetwork;
-    // EWD::routerName = "chicken";
-    // EWD::routerPassword = "bawkbawk";
-    // EWD::routerPort = 25211;
+    EWD::mode = EWD::Mode::connectToNetwork;
+    EWD::routerName = "arm";
+    EWD::routerPassword = "password";
+    EWD::routerPort = 25210;
 
-    EWD::mode = EWD::Mode::createAP;
-    EWD::APName = "arm";
-    EWD::APPassword = "password";
-    EWD::APPort = 25210;
+    // EWD::mode = EWD::Mode::createAP;
+    // EWD::APName = "arm";
+    // EWD::APPassword = "password";
+    // EWD::APPort = 25210;
 }
 
 void WifiDataToParse()
